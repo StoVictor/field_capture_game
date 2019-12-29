@@ -1,0 +1,401 @@
+<!Doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Field capture</title>
+        <link href="https://fonts.googleapis.com/css?family=Saira+Stencil+One&display=swap" rel="stylesheet">
+        <link href={{url_for('static', filename='main.css')}} rel="stylesheet" type="text/css"> 
+        <link href={{url_for('static', filename='room.css')}} rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <canvas class="particles-canvas" id="c"></canvas>
+        <div class="main-wrapper main-wrapper_room">
+            <div class="score-block main-wrapper__score-block">
+                <div class="greater-score greater-score_style player-score_first player-score_first-shadow">Victor: 222 </div>
+                <div class="score-table score-block__score-table score-table_style">
+                   <!-- <div class="score-table__player-score player-score_first"></div>                     
+                    <div class="score-table__player-score player-score_second"></div> 
+                    <div class="score-table__player-score player-score_third"></div> 
+                    <div class="score-table__player-score player-score_fourth"></div> !-->
+                </div>
+            </div>
+            <div class="main-block main-wrapper__main-block">
+                <div class="clock clock_green"> 20 </div>
+                <canvas class="game-field" id="game-field" width="600px" height="400px"></canvas>
+                <div class="main-block__dice-and-buttons-block">
+                    <div class="buttons-block dice-and-buttons-block__buttons-block"> 
+                        <div class="main-button_style buttons-block__main-button main-button_room main-button_start"> Start </div>
+                        <a class="main-button_style buttons-block__main-button main-button_room main-button_exit" 
+                            href="{{url_for('main.index')}}"> Exit </a>
+                    </div>
+                    <canvas class="dice" id="dice" width='200px' height='100px'></canvas>
+                    <div class="buttons-block dice-and-buttons-block__buttons-block">
+                        <div class="main-button_style buttons-block__main-button main-button_room" id='miss_turn'> Miss turn </div>
+                        <div class="main-button_style buttons-block__main-button main-button_room" id='roll_dice'> Roll dice </div> 
+                    </div>
+                </div>
+            </div>
+            <div class="right-block main-wrapper__right-block">
+                <div class="events-block right-block__events-block mod_scroll"> </div>
+                <div class="main-button_style main-button_room right-block__main-button main-button_surrender" id='surrender'> Surrender
+                </div>
+            </div>
+            <div class="winner-block main-wrapper__winner-block popup-menu_style winner-block_hidden">
+                <div class="win-text">Player win with score: xxx</div>
+                <div class="main-button_style winner-block__main-button" id="close-winner-block">OK</div>
+            </div>
+        </div>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+         <script src={{ url_for('static', filename='particles.js')}} type="text/javascript"></script>
+        <script src={{ url_for('static', filename='game_graphic.js')}} type="text/javascript"></script>
+        <script> 
+        var socket = io({transports:['websocket'], upgrade:false});
+
+        var players_style = ['player-score_first', 'player-score_second', 
+                             'player-score_third', 'player-score_fourth',
+                             ];
+
+        var player_colors = ['#ffffff', '#6eff76', '#fae76b', '#ff5d5d', '#8282ff'];
+        //var figure_colors = ['#ffffff', '#1cff29', '#4f4f4f', '#f53b3b', '#4444eb'];
+        var figure_colors = ['#ffffff',  '#16e916', '#ffee36', '#ff0000', '#0000ff'];
+        g_f = [];
+        for (var i=0; i < 24; i++) {
+            s = [];
+            for (var k=0; k < 16; k++) {
+                if (i < 6 && k < 4) {
+                   s.push(1);
+                 } else if(i < 12 && k < 8) {
+                     s.push(2);
+                 } else if ( i < 18 && k < 12) {
+                     s.push(3);
+                 } else {
+                     s.push(4);
+                 }
+            }
+            g_f.push(s); 
+        }
+        //console.log(g_f);
+        //build_field_from_data(g_f);
+
+        var my_color = null;
+        var is_my_turn = false;
+        var dice_has_rolled = false;
+    
+        var game_field = [];
+        var start_button = document.getElementsByClassName('main-button_start')[0];
+        var miss_turn_button = document.getElementById('miss_turn');
+	    var game_clock = document.getElementsByClassName('clock')[0];
+        var roll_dice = document.getElementById('roll_dice');
+        var close_winner_block = document.getElementById('close-winner-block');
+        var winner_block = document.getElementsByClassName('winner-block')[0];
+        var win_text = document.getElementsByClassName('win-text')[0];
+        var surrender_button = document.getElementById('surrender');
+        var event_board = document.getElementsByClassName('events-block')[0];
+        var surrender_status = false;
+        var dice_change_interval = null;
+        var f_width = 0;
+        var f_height = 0;
+
+	    var tick_time = 20;
+	    var timer_id = 0;
+        var room_status = false;
+
+            paint_game_field();
+            init_dice_field();
+            draw_init_dice();
+
+        socket.emit('join', {{room_id | tojson}});
+
+	    function start_timer(){	
+            var timer = setInterval(function func() {
+                if (tick_time != 0) {
+                tick_time = tick_time - 1;
+                if (tick_time <= 5) {
+                    game_clock.classList.remove('clock_yellow');
+                    game_clock.classList.add('clock_red');
+                } else if (tick_time <= 10) {
+                    game_clock.classList.remove('clock_green');
+                    game_clock.classList.add('clock_yellow');
+                }
+
+                game_clock.innerHTML = tick_time;
+                }
+            }, 1000);
+            return timer
+	    }
+
+        function write_message(message, color) {
+            if (color == -1) {
+                event_board.innerHTML += "<div class='events-block__message_wrong'>" + message + "</div>";
+            } else {
+                event_board.innerHTML += "<div class='" + players_style[color-1] + "'>" + message + "</div>";
+            }
+            event_board.scrollTop = event_board.scrollHeight;
+        }
+
+        start_button.onclick = function() {
+            socket.emit('change_ready_status');
+        }
+
+        miss_turn_button.onclick = function() {
+            if (is_my_turn == true) {
+                socket.emit('miss_turn');
+            } else {
+                write_message('Not your turn!', -1);
+            }
+        }
+
+        roll_dice.onclick = function() {
+            if (is_my_turn == true) {
+                if (dice_has_rolled == false){
+                    socket.emit('roll_dice');
+                    animate_roll_dice();
+                } else {
+                    write_message('You already rolled dice!', -1);
+                }
+            } else {
+                write_message('Not your turn!', -1);
+            }
+        }
+
+        surrender.onclick = function() {
+            if (room_status == true){
+                if (surrender_status == false){
+                    socket.emit('surrender');
+                    surrender_status = true;
+                }
+            } else {
+                write_message("Game doesn`t start yet!", -1);
+            }
+       }
+
+        close_winner_block.onclick = function() {
+            winner_block.classList.remove('winner-block_show');
+            winner_block.classList.add('winner-block_hidden');
+        }
+
+       canv.onclick = function (e) {     
+            if (is_my_turn) {
+                x = e.pageX - this.offsetLeft;
+                y = e.pageY - this.offsetTop;
+                x = x - (x % 25);
+                y = y - (y % 25);
+                cell_side = 25;
+                cell_y = Math.round(y / cell_side);
+                cell_x = Math.round(x / cell_side);
+                //if (is_it_possbile_to_create_figure(x, y, width, height, field)) {
+                socket.emit('set_figure', cell_x, cell_y);
+                //}
+            } else { 
+                write_message('Not your turn!', -1);
+            }
+       }
+
+       // animated part of field following by pointer
+       var x_prev = -25;
+       var y_prev = -25;
+       var painted_x = -25;
+       var painted_y = -25;
+
+       canv.onmousemove = function (e) {
+           if (is_my_turn && dice_has_rolled) {
+               var x = e.pageX - this.offsetLeft;
+               var y = e.pageY - this.offsetTop;
+               var temp_x = x - (x % 25);
+               var temp_y = y - (y % 25);
+               //console.log(temp_x / 25, temp_y / 25);
+               if ((painted_x != temp_x) || (painted_y != temp_y)) {
+                   painted_x = temp_x;
+                   painted_y = temp_y;
+                   if ((x_prev >= 0) && (y_prev >= 0)) {
+                       make_figure(x_prev, y_prev, f_width, f_height, figure_colors[0], game_field);
+                   }
+                   console.log(figure_colors[my_color]);
+                   make_figure(painted_x, painted_y, f_width, f_height, figure_colors[my_color], game_field);
+                   x_prev = painted_x;
+                   y_prev = painted_y;
+               }
+           }
+       }
+         
+       canv.onmouseout = function(e) {
+           if (is_my_turn) {
+                make_figure(x_prev, y_prev, f_width,  f_height, figure_colors[0], game_field);
+                x_prev = -25;
+                y_prev = -25;
+                painted_x = -25;
+                painted_y = -25;
+            }
+       }
+
+        function refresh_leader_player_score(leader_player){
+            var greater_score_element = document.getElementsByClassName('greater-score')[0];
+            var max_player_amount = 4;
+            console.log("IIIIIII", leader_player);
+            for (var i=0; i < max_player_amount; i++){
+                if (i == (leader_player['order_of_turn'] - 1)){
+                    greater_score_element.classList.add(players_style[i]);
+                    greater_score_element.classList.add(players_style[i] + '-shadow');
+                } else {
+                    greater_score_element.classList.remove(players_style[i]);
+                    greater_score_element.classList.remove(players_style[i] + '-shadow');
+                }
+            }
+
+            greater_score_element.innerHTML = leader_player['username'] + ': ' + leader_player['score'];
+        }
+
+        function refresh_score_list(score_dicts, room_status){
+            var score_dicts_len = score_dicts.length;
+            var score_table = document.getElementsByClassName('score-table')[0];
+
+            score_table.innerHTML = '';
+
+            console.log("SCORE TABLE REFRESH", score_dicts, room_status);
+
+            for (var i=0; i < score_dicts_len; i++){
+                var additional_classes = '';
+                additional_classes += players_style[i] + ' ';
+                if (score_dicts[i]['token_presence'] == true){
+                    additional_classes += 'player-score_current ';
+                } 
+                if (score_dicts[i]['ready'] == true) {
+                    additional_classes += 'player-score_ready ';
+                }
+                if (score_dicts[i]['surrender'] == true) {
+                    additional_classes += 'player-score_surrender ';
+                }
+                // here is a question occur when we doesn't start a game
+                if ((score_dicts[i]['playing'] == false) && (room_status == true)) {
+                    additional_classes += 'player-score_exit ';
+                }
+
+                score_table.innerHTML +=  "<div class='score-table__player-score "
+                    + additional_classes + "'>" + score_dicts[i]['username'] + ": " + score_dicts[i]['score'] + "</div>";
+            }
+        }
+
+        socket.on('refresh_score_table', function(score_list, leader_player, room_status) {
+            refresh_leader_player_score(leader_player);
+            refresh_score_list(score_list, room_status);
+        })
+
+        socket.on('inf_board_message', function(message_list) {
+            len = message_list.length;
+            for (var i = 0; i < len; i++){
+                for (var key in message_list[i]){
+                    write_message(message_list[i][key], key);
+                }
+            }
+        })
+
+        socket.on('update_token_inf', function(id) {
+            if (id == {{session['pers_id'] | tojson}}){
+                is_my_turn = true;
+            } else {
+                is_my_turn = false;
+            }
+        }) 
+
+        socket.on('refresh_game_clock', function(){
+            game_clock.innerHTML = 20;
+            tick_time = 20;
+            if (timer_id != 0) {
+                clearInterval(timer_id);
+            }
+
+            game_clock.classList.remove('clock_yellow');
+            game_clock.classList.remove('clock_red');
+            game_clock.classList.add('clock_green');
+
+            timer_id = start_timer();
+        })
+
+        socket.on('refresh_dice_rolled_status', function() {
+            dice_has_rolled = false;
+            f_width = 0;
+            f_height = 0;
+        })
+
+        socket.on('dice_rolled', function(width, height){ 
+            dice_has_rolled = true;
+            setTimeout(function() {
+                clearInterval(dice_change_interval);
+                init_dice_field();
+                f_width = width;
+                f_height = height;
+                decide_what_dice_print(width, height, color='#9e1a1a');
+            }, 3000);
+        })
+
+        socket.on('set_local_init_data', function(color, field){
+            my_color = color;
+            game_field = JSON.parse(field);
+        }); 
+
+        socket.on('refresh_color', function(players_and_colors) {
+
+            pac = JSON.parse(players_and_colors);
+            console.log(pac);
+            for (var i=0; i < pac.length; i++){ 
+                if (pac[i]['id'] == {{session['pers_id'] | tojson}}){
+                    my_color = pac[i]['color'];
+                }
+            }
+        });
+
+        socket.on('refresh_game_field', function(field) {
+            game_field = JSON.parse(field);
+            build_field_from_data(game_field);
+        });
+
+        socket.on('show_win_window', function(winner_name, score, color) {
+            console.log('SHOW WIN WINDOW', winner_name, score, color);
+            winner_block.classList.add('winner-block_show');
+            winner_block.classList.remove('winner-block_hidden');
+            win_text.innerHTML = winner_name + ' win ' + 'with score: ' + score;
+            for (var i=0; i < players_style.length; i++) { 
+                win_text.classList.remove(players_style[i]);
+                console.log(players_style[i]);
+            }
+            win_text.classList.add(players_style[color-1]);
+        });
+
+        socket.on('stop_game_clock', function(current_player_id) {
+            if (current_player_id == {{session['pers_id'] | tojson}}) { 
+                socket.emit('miss_turn');
+            }
+        })
+        socket.on('refresh_players_data', function() {
+            game_clock.innerHTML = 20;
+            tick_time = 20;
+            if (timer_id != 0) {
+                clearInterval(timer_id);
+            }
+
+            game_clock.classList.remove('clock_yellow');
+            game_clock.classList.remove('clock_red');
+            game_clock.classList.add('clock_green');
+
+            f_width = 0;
+            f_height = 0;
+
+            is_my_turn = false;
+            dice_has_rolled = false;
+
+            surrender_status = false;
+
+            init_dice_field();
+            draw_init_dice();
+
+            event_board.innerHTML = '';
+        });
+
+        socket.on('set_room_status', function(rs) {
+            room_status = rs;
+        });
+        //build_field_from_data(g_f);
+        //build_field_from_data(g_f);
+        </script>
+    </body>
+</html>

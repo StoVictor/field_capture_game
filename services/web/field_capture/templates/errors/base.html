@@ -1,0 +1,16 @@
+<!Doctype>
+<html>
+    <head>
+        <title>field-capture</title>
+        <meta charset='utf-8'> 
+        <link rel='stylesheet' type='text/css' href={{ url_for('static', filename='error.css') }}>
+    </head>
+    <body>
+        <h1> 
+        {% block main_message %}
+        {% endblock %}
+        </h1>
+        <a href="{{url_for('main.index')}}">Go to the main page</a>
+    </body>
+</html>
+

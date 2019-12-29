@@ -1,0 +1,87 @@
+<!Doctype html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title>Field-capture</title>
+        <link rel='stylesheet' type='text/css' href={{ url_for('static', filename='main.css') }}>
+        <link rel='stylesheet' type='text/css' href={{ url_for('static', filename='index.css') }}>
+        <link href="https://fonts.googleapis.com/css?family=Oswald|Russo+One&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Darker+Grotesque&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <canvas class="particles-canvas" id="c"></canvas>
+        <div class="back-darkness" id="back-darkness"></div>
+        <div class="main-wrapper">
+            <menu class="main-wrapper__menu menu_style">
+                <li class="menu__main-button main-button_style" id="change-username-button">Change username</li> 
+                <li class="menu__main-button main-button_style" id="room-block-button">Go to public room</li>
+                <li class="menu__main-button main-button_style" id="go-to-private-room-button">Go to private room</li>
+                <li class="menu__main-button main-button_style" id="create-room-button">Create room</li>
+                <div class="menu__error-block error-block">
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <ul class=flashes>
+                                {% for message in messages %}
+                                    <li>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </menu>
+            <div class="main-wrapper__popup-menu popup-menu_style" id="change-username-block">
+                <input type="button" value="X" class="popup-menu__close-button close-button_style" id="close-change-username-block">
+                <form method="POST" class="popup-menu__main-form" name="username" id="username">
+                    {{ name_form.csrf_token }}
+                    <div>{{ name_form.name.label }}: {{session['username']}}</div> {{ name_form.name }} 
+                    {{ name_form.submit(class='main-button_style main-form__main-button') }}
+                </form>
+            </div>
+            <div class="main-wrapper__popup-menu popup-menu_style" id="create-room-block">
+                 <input type="button" value="X" class="popup-menu__close-button close-button_style" id="close-create-room-block">
+                 <form method="POST" class="popup-menu__main-form" name="create_room" 
+                     id="create_room" action="{{url_for('main.create_room')}}">
+                    {{ create_room_form.csrf_token }}
+                    Write a room name:
+                    {{ create_room_form.name }}
+                    <span>Amount of players:</span>
+                    <div>
+                        {% for subfield in create_room_form.players_amount %}
+                        {{ subfield }} {{ subfield.label }}<br>
+                        {% endfor %}
+                    </div>
+                    <span>Room type:</span>
+                    <div>
+                       {% for subfield in create_room_form.room_type %}
+                       {{ subfield }} {{subfield.label}}<br>
+                       {% endfor %}
+                    </div>
+                    {{ create_room_form.submit(class='main-button_style main-form__main-button') }}
+                 </form>
+            </div>
+            <div class="main-wrapper__popup-menu popup-menu_style" id="go-to-private-room-block">
+                <input type="button" value="X" class="popup-menu__close-button close-button_style" id="close-go-to-private-room-block">
+                <form method="POST" class="popup-menu__main-form" id="room_enter_code" action="{{url_for('main.enter_private_room')}}">
+                    {{ room_code_enter_form.csrf_token}}
+                    Write a code to room:
+                    {{ room_code_enter_form.code }}
+                    {{ room_code_enter_form.submit(class='main-button_style main-form__main-button') }}
+                </form>
+            </div>
+            <div class="main-wrapper__popup-menu popup-menu_style popup-menu_more_width" id="room-block">
+                <input type="button" value="X" class="popup-menu__close-button close-button_style" id="close-room-block">
+                <span>Rooms:</span>
+                <div class="popup-menu__room-list room-list_style mod_scroll">
+                    {% for room in public_rooms %}
+                    <div class="room-list__room room_style">
+                        <a class="room-link-style" href="/room?id={{ room.id }}" name='public-room'>{{ room.name }}</a> 
+                        | place: {{room.players|length}}/{{room.size}}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <script src={{url_for('static', filename='particles.js')}}></script>
+        <script src={{url_for('static', filename='buttons.js')}}></script>
+    </body>
+</html>

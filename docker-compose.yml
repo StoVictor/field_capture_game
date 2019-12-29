@@ -1,0 +1,55 @@
+version: '3.3'
+
+services:
+    web:
+        build:
+            context: ./services/web
+            dockerfile: Dockerfile
+        command: gunicorn --bind 0.0.0.0:5000 --worker-class eventlet -w 1 app:app
+        volumes:
+            - static_volume:/home/app/web/field_capture/static
+        expose:
+            - 5000
+        env_file:
+            - ./.env.dev
+        depends_on:
+            - db
+            - rabbit
+        links:
+            - rabbit
+    db:
+        image: postgres:12.0-alpine
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        env_file:
+            - ./.env.dev.db
+    nginx:
+        build: ./services/nginx
+        volumes:
+            - static_volume:/home/app/web/field_capture/static
+        ports:
+            - 80:80
+        depends_on:
+            - web
+    rabbit:
+        image: rabbitmq:3-management
+        hostname: rabbit
+        env_file:
+            - ./.env.dev.rabbitmq
+        volumes:
+          - "./rabbitmq.config:/etc/rabbitmq/rabbitmq.config"
+          - "./definitions.json:/etc/rabbitmq/definitions.json"
+        expose:
+          - 5672
+    celery:
+        build: ./services/web
+        command: [celery, worker, --app=celery_worker.celery, --loglevel=info]
+        env_file:
+            - ./.env.dev
+        depends_on:
+            - rabbit
+        links:
+            - rabbit
+volumes:
+    postgres_data:
+    static_volume:

@@ -1,0 +1,259 @@
+.main-wrapper_room {
+    justify-content:space-around;
+    height: 100%;
+}
+
+.main-wrapper__main-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.main-block__dice-and-buttons-block {
+    display: flex;
+    justify-content: space-around;
+    width: 600px;
+    margin: 5px 0px 0px 0px;
+}
+
+.dice-and-buttons-block__buttons-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.dice-and-buttons-block__buttons-block {
+    display: flex;
+    justify-content: space-around;
+}
+
+.main-button_room {
+    border-radius: 10px;
+    box-shadow: 0 4px #000000;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;     
+    outline: none;
+    color: #fff;
+    padding: 5px 20px;
+    height: 20px;
+    border: 2px double black;
+}
+
+
+.main-wrapper__score-block { 
+    max-width: 240px;
+    width: 240px;
+    align-self: flex-start;
+    margin: 80px 0px 0px 0px;
+}
+
+.greater-score_style {
+    font-size: 36px;
+    font-family: 'Saira Stencil One', cursive;
+}
+
+.score-block__score-table {
+    display: flex;
+    flex-direction: column;
+}
+
+.score-table_style {
+    color: white;
+    font-size: 20px;
+    background-color: #0c0047; 
+    font-family: 'Saira Stencil One', cursive;
+}
+
+.score-table__player-score  {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px;
+    border: 1px solid white;
+}
+
+.player-score_current {
+    border-color: red;
+}
+
+.player-score_ready {
+    background-color: rgba(0,255,0,0.3);
+}
+
+.player-score_surrender {
+    background-color: white;
+}
+
+.player-score_exit {
+    background-color: gray;
+}
+
+.player-score_first {
+    color: #6eff76;
+}
+
+.player-score_second {
+   /* color: #b5b4b4; */
+    color: #fae76b;
+}
+
+.player-score_third {
+    /*color: #ff5d5d; */
+    color: #ff5d5d;
+}
+
+.player-score_fourth {
+    /* color: #8e8eff; */
+    color: #8282ff;
+}
+
+.player-score_first-shadow {
+    text-shadow:
+        0 0 5px #00fc0d,
+        0 0 10px #00fc0d,
+        0 0 20px #00fc0d,
+        0 0 40px #00fc0d,
+        0 0 80px #00fc0d,
+        0 0 90px #00fc0d,
+        0 0 100px #00fc0d,
+        0 0 150px #00fc0d;
+}
+
+.player-score_second-shadow {
+    text-shadow:
+        0 0 5px #9d9d9d,
+        0 0 10px #9d9d9d,
+        0 0 20px #9d9d9d,
+        0 0 40px #9d9d9d,
+        0 0 80px #9d9d9d,
+        0 0 90px #9d9d9d,
+        0 0 100px #9d9d9d,
+        0 0 150px #9d9d9d;
+}
+
+.player-score_third-shadow {
+    text-shadow:
+        0 0 5px #fc1919,
+        0 0 10px #fc1919,
+        0 0 20px #fc1919,
+        0 0 40px #fc1919,
+        0 0 80px #fc1919,
+        0 0 90px #fc1919,
+        0 0 100px #fc1919,
+        0 0 150px #fc1919;
+}
+
+.player-score_fourth-shadow {
+    text-shadow:
+        0 0 5px #1818ff,
+        0 0 10px #1818ff,
+        0 0 20px #1818ff,
+        0 0 40px #1818ff,
+        0 0 80px #1818ff,
+        0 0 90px #1818ff,
+        0 0 100px #1818ff,
+        0 0 150px #1818ff;
+}
+
+.clock {
+    font-size: 28px;
+    font-family: 'Saira Stencil One', cursive;
+}
+
+.clock_green {
+    color: #00ff0d;
+}
+
+.clock_yellow {
+    color: yellow;
+}
+
+.clock_red {
+    color: red;
+}
+
+.main-wrapper__right-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    width: 240px;
+    align-self: flex-start;
+    margin: 44px 0px 0px 0px;
+}
+
+.right-block__events-block {
+    background-color: #1f1d1c;
+    border: 2px solid #fff;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    width: 210px;
+    height: 400px;
+    flex-grow: 1;
+    align-items: center;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.events-block > div {
+    text-align: center;
+    padding: 3px 2px;
+    width: 100%;
+    border-bottom: 2px solid black;
+}
+
+.events-block__message_wrong {
+    color: red;
+}
+
+.right-block__main-button {
+    margin: 35px 0px 0px 0px;
+}
+
+.main-button_surrender {
+    background-color: white;
+    color: #24207c;
+}
+
+.main-button_surrender:hover { background-color: #d4d2d2; }
+
+.main-button_exit { 
+    background-color: #e03f3f; 
+}
+
+.main-button_exit:hover { background-color: #802121 }
+
+.main-button_start { background-color: #5cba30; }
+
+.main-button_start:hover { background-color: #2f5919; }
+
+.winner-block {
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 400px;
+    height: 100px;
+
+    position: absolute;
+    margin:auto;
+
+    padding: 10px;
+}
+
+.winner-block_show {
+    display: flex;
+}
+
+.winner-block_hidden {
+    display: none;
+}
+
+.win-text {
+    text-align: center;
+}
+
+.winner-block__main-button {
+    width: 100px;
+}
