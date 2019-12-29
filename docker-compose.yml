@@ -11,7 +11,7 @@ services:
         expose:
             - 5000
         env_file:
-            - ./.env.dev
+            - ./env.dev
         depends_on:
             - db
             - rabbit
@@ -22,7 +22,7 @@ services:
         volumes:
             - postgres_data:/var/lib/postgresql/data
         env_file:
-            - ./.env.dev.db
+            - ./env.dev.db
     nginx:
         build: ./services/nginx
         volumes:
@@ -35,7 +35,7 @@ services:
         image: rabbitmq:3-management
         hostname: rabbit
         env_file:
-            - ./.env.dev.rabbitmq
+            - ./env.dev.rabbitmq
         volumes:
           - "./rabbitmq.config:/etc/rabbitmq/rabbitmq.config"
           - "./definitions.json:/etc/rabbitmq/definitions.json"
@@ -45,7 +45,7 @@ services:
         build: ./services/web
         command: [celery, worker, --app=celery_worker.celery, --loglevel=info]
         env_file:
-            - ./.env.dev
+            - ./env.dev
         depends_on:
             - rabbit
         links:
