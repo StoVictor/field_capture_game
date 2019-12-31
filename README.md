@@ -3,7 +3,7 @@
 ## To run
 
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
 go to (http://localhost)
 
