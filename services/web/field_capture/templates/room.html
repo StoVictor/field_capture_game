@@ -8,7 +8,7 @@
         <link href={{url_for('static', filename='room.css')}} rel="stylesheet" type="text/css">
     </head>
     <body>
-        <canvas class="particles-canvas" id="c"></canvas>
+        <div id="particles-js" class="particles-canvas"></div>
         <div class="main-wrapper main-wrapper_room">
             <div class="score-block main-wrapper__score-block">
                 <div class="greater-score greater-score_style player-score_first player-score_first-shadow">Victor: 222 </div>
@@ -231,7 +231,6 @@
         function refresh_leader_player_score(leader_player){
             var greater_score_element = document.getElementsByClassName('greater-score')[0];
             var max_player_amount = 4;
-            console.log("IIIIIII", leader_player);
             for (var i=0; i < max_player_amount; i++){
                 if (i == (leader_player['order_of_turn'] - 1)){
                     greater_score_element.classList.add(players_style[i]);
@@ -250,8 +249,6 @@
             var score_table = document.getElementsByClassName('score-table')[0];
 
             score_table.innerHTML = '';
-
-            console.log("SCORE TABLE REFRESH", score_dicts, room_status);
 
             for (var i=0; i < score_dicts_len; i++){
                 var additional_classes = '';
@@ -394,8 +391,12 @@
         socket.on('set_room_status', function(rs) {
             room_status = rs;
         });
-        //build_field_from_data(g_f);
-        //build_field_from_data(g_f);
+
+
+        particlesJS.load('particles-js', "{{url_for('static', filename='particles.json')}}", function() {
+            console.log('callback - particles.js config loaded');
+        });
+
         </script>
     </body>
 </html>
