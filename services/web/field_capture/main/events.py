@@ -181,7 +181,7 @@ def roll_dice_handler():
 
     async_board_message.apply_async((room_id, message, color,
                                      number_of_moves,),
-                                    countdown=3)
+                                    countdown=2)
 
     emit('dice_rolled', (width, height,))
 

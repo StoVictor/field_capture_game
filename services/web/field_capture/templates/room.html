@@ -8,7 +8,7 @@
         <link href={{url_for('static', filename='room.css')}} rel="stylesheet" type="text/css">
     </head>
     <body>
-        <div id="particles-js" class="particles-canvas"></div>
+        <canvas id="c" class="particles-canvas"></canvas>
         <div class="main-wrapper main-wrapper_room">
             <div class="score-block main-wrapper__score-block">
                 <div class="greater-score greater-score_style player-score_first player-score_first-shadow">Victor: 222 </div>
@@ -322,7 +322,7 @@
                 f_width = width;
                 f_height = height;
                 decide_what_dice_print(width, height, color='#9e1a1a');
-            }, 3000);
+            }, 2000);
         })
 
         socket.on('set_local_init_data', function(color, field){
@@ -391,12 +391,6 @@
         socket.on('set_room_status', function(rs) {
             room_status = rs;
         });
-
-
-        particlesJS.load('particles-js', "{{url_for('static', filename='particles.json')}}", function() {
-            console.log('callback - particles.js config loaded');
-        });
-
         </script>
     </body>
 </html>
