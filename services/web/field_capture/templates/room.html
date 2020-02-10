@@ -45,8 +45,9 @@
                 <div class="main-button_style winner-block__main-button" id="close-winner-block">OK</div>
             </div>
         </div>
-         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-         <script src={{ url_for('static', filename='particles.js')}} type="text/javascript"></script>
+        <!--<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script> !-->
+        <script src={{ url_for('static', filename='socket.io.js')}} type="text/javascript"></script>
+        <script src={{ url_for('static', filename='particles.js')}} type="text/javascript"></script>
         <script src={{ url_for('static', filename='game_graphic.js')}} type="text/javascript"></script>
         <script> 
         var socket = io({transports:['websocket'], upgrade:false});
@@ -306,13 +307,13 @@
             game_clock.classList.add('clock_green');
 
             timer_id = start_timer();
-        })
+        });
 
         socket.on('refresh_dice_rolled_status', function() {
             dice_has_rolled = false;
             f_width = 0;
             f_height = 0;
-        })
+        });
 
         socket.on('dice_rolled', function(width, height){ 
             dice_has_rolled = true;
@@ -323,7 +324,7 @@
                 f_height = height;
                 decide_what_dice_print(width, height, color='#9e1a1a');
             }, 2000);
-        })
+        });
 
         socket.on('set_local_init_data', function(color, field){
             my_color = color;
@@ -333,7 +334,6 @@
         socket.on('refresh_color', function(players_and_colors) {
 
             pac = JSON.parse(players_and_colors);
-            console.log(pac);
             for (var i=0; i < pac.length; i++){ 
                 if (pac[i]['id'] == {{session['pers_id'] | tojson}}){
                     my_color = pac[i]['color'];
@@ -347,13 +347,11 @@
         });
 
         socket.on('show_win_window', function(winner_name, score, color) {
-            console.log('SHOW WIN WINDOW', winner_name, score, color);
             winner_block.classList.add('winner-block_show');
             winner_block.classList.remove('winner-block_hidden');
             win_text.innerHTML = winner_name + ' win ' + 'with score: ' + score;
             for (var i=0; i < players_style.length; i++) { 
                 win_text.classList.remove(players_style[i]);
-                console.log(players_style[i]);
             }
             win_text.classList.add(players_style[color-1]);
         });
