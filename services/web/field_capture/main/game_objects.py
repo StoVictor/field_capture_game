@@ -34,6 +34,16 @@ class RoomManager:
         public_rooms = Room.query.filter_by(type='public').all()
         return public_rooms
 
+    @staticmethod
+    def get_main_public_rooms_info_json():
+        public_rooms = RoomManager.get_public_rooms()
+        public_room_list = []
+        for room in public_rooms:
+            public_room_list.append({"id": room.id, "name": room.name,
+                                     "size": room.size, "status": room.status,
+                                     "players_amount": len(room.players)})
+        return json.dumps(public_room_list)
+
     def get_json_players_id_with_colors(self):
         ids_and_colors = []
         for p in self.room.players:
@@ -50,6 +60,10 @@ class RoomManager:
         if self.room.status == 'playing':
             return True
         return False
+
+    @staticmethod
+    def get_rooms_list():
+        rooms = Room.query.all()
 
     def are_players_ready(self):
         i = 0

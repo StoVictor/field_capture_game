@@ -248,3 +248,9 @@ def set_figure_handler(x, y):
     emit('refresh_game_field', field, room=session['room_id'])
 
     send_board_message_and_refresh_score_table(pm.room_manager, message_list)
+
+
+@socketio.on('get_room_list', namespace='/main')
+def hello_resp():
+    rooms_info = game_objects.RoomManager.get_main_public_rooms_info_json()
+    emit('get_room_list_resp', rooms_info, namespace='/main')

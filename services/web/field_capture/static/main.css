@@ -34,6 +34,17 @@
     font-family: 'Russo One', sans-serif;
 }
 
+.refresh-button {
+    width: 30%;
+    align-self: center;
+}
+
+.refresh-button:hover {
+    background-color: #121238;
+    cursor: pointer;
+    font-family: 'Oswald', sans-serif;
+}
+
 .main-button_style:active {
     box-shadow: none;
     top: 5px;

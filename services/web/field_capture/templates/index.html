@@ -71,7 +71,7 @@
             <div class="main-wrapper__popup-menu popup-menu_style popup-menu_more_width" id="room-block">
                 <input type="button" value="X" class="popup-menu__close-button close-button_style" id="close-room-block">
                 <span>Rooms:</span>
-                <div class="popup-menu__room-list room-list_style mod_scroll">
+                <div class="popup-menu__room-list room-list_style mod_scroll" id="room-list">
                     {% for room in public_rooms %}
                     <div class="room-list__room room_style">
                         <a class="room-link-style" href="/room?id={{ room.id }}" name='public-room'>{{ room.name }}</a> 
@@ -79,9 +79,40 @@
                     </div>
                     {% endfor %}
                 </div>
+                <input type="button" value="Refresh" class="main-button_style refresh-button" id="refresh-list-button">
             </div>
         </div>
+        <script src={{url_for('static', filename='socket.io.js')}}></script>
         <script src={{url_for('static', filename='particles.js')}}></script>
         <script src={{url_for('static', filename='buttons.js')}}></script>
+        <script> 
+            var socket = io('/main', {transports:['websocket'], upgrade:false});
+            var refresh_button = document.getElementById('refresh-list-button');
+            function refresh_rooms_list(rooms_info){
+                rooms_info = JSON.parse(rooms_info);
+                var room_list = document.getElementById('room-list');
+                room_list.innerHTML = '';
+                for(var i=0; i < rooms_info.length; i++){
+                    var html = '<div class="room-list__room room_style" id="inner-room-list">' + '<a class="room-link-style" href="/room?id=' + rooms_info[i]['id'] + '" name="public-room">' + rooms_info[i]['name'] + '</a> | place: ' + rooms_info[i]['players_amount'] + '/' + rooms_info[i]['size'] + '</div>';
+                    room_list.innerHTML=html;
+                }
+            }
+
+            room_block_button.onclick = function() {
+                socket.emit('get_room_list');
+                room_block.style.display = "flex";
+                document.body.style.background = "black";
+                back_darkness.height = window.innerHeight;
+                back_darkness.style.display = 'block';
+            }
+
+            refresh_button.onclick = function() {
+                socket.emit('get_room_list');
+            }
+
+            socket.on('get_room_list_resp', function(rooms_info){
+                refresh_rooms_list(rooms_info);
+            });
+        </script>
     </body>
 </html>
