@@ -16,7 +16,7 @@ This is a simple game where you need to capture field by rolling dice
 2. Number from dices is your figures width and height
 3. You need to put your figure on field (if there will be a place for it)
 
-<img src="https://media.giphy.com/media/W3kbNrmehVMgqLwQ23/giphy.gif" width="512" height="320" />
+<img src="https://media.giphy.com/media/Za3LuUaZZK60csYEtq/giphy.gif" width="512" height="320" />
 
 4. You may surrend and continue spectate the game
 
