@@ -1,4 +1,4 @@
-# field_capture_game_docker
+# field_capture_game
 
 ## To run
 
