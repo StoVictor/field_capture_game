@@ -20,7 +20,8 @@ This is a simple game where you need to capture field by rolling dice
 
 4. You may surrend and continue spectate the game
 
-![Image]("https://media.giphy.com/media/Za3LuUaZZK60csYEtq/giphy.gif")
+<img src="https://media.giphy.com/media/cJBTdFZ9h9w2l2GmVG/giphy.gif" width="512" height="320" />
+
 
 4. Game ends when somebody captures ((players_number/field_size)\*100)% of field
 5. Enjoy
