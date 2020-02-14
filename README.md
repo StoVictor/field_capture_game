@@ -19,11 +19,8 @@ This is a simple game where you need to capture field by rolling dice
 <img src="https://media.giphy.com/media/W3kbNrmehVMgqLwQ23/giphy.gif" width="512" height="320" />
 
 4. You may surrend and continue spectate the game
-
-<img src="https://media.giphy.com/media/d8F3lVsZ8uPMNFRboJ/giphy.gif" width="512" height="320" />
-
-4. Game ends when somebody captures ((players_number/field_size)\*100)% of field
-5. Enjoy
+5. Game ends when somebody captures ((players_number/field_size)\*100)% of field
+6. Enjoy
 
 <img src="https://media.giphy.com/media/iJacKoCMkcltW6QZEf/giphy.gif" width="512" height="320" />
 
